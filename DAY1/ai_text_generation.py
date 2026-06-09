@@ -18,7 +18,7 @@ client = OpenAI(
 
 # 发送请求 - 问一个网络工程相关的问题
 response = client.chat.completions.create(
-    model="gpt-4.1-nano",
+    model="gpt-5.4-nano",
     messages=[
         {"role": "user", "content": "请简要解释一下什么是BGP协议，以及它在互联网中的作用？"}
     ]
