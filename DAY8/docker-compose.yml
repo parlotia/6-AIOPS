@@ -1,0 +1,46 @@
+# Docker Compose - MCP Server + Nginx HTTPS 部署
+#
+# 架构:
+#   Agent (本地) → HTTPS :443 → Nginx → HTTP :8000 → MCP Server → SSH → 网络设备
+#
+# 使用:
+#   docker compose up --build -d
+#   docker compose logs -f
+#   docker compose down
+
+services:
+  # MCP Server - 网络设备信息工具服务
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-server
+    networks:
+      - mcp-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,json; req=urllib.request.Request('http://localhost:8000/mcp',method='POST',headers={'Accept':'application/json, text/event-stream','Content-Type':'application/json'},data=json.dumps({'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-03-26','capabilities':{},'clientInfo':{'name':'hc','version':'1.0'}}}).encode()); urllib.request.urlopen(req)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx - HTTPS 反向代理 (TLS 加密)
+  nginx:
+    image: nginx:alpine
+    container_name: mcp-nginx
+    ports:
+      - "9443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/nginx/ssl:ro
+    depends_on:
+      - mcp-server
+    networks:
+      - mcp-net
+    restart: unless-stopped
+
+networks:
+  mcp-net:
+    driver: bridge

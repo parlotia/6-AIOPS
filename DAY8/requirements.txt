@@ -1,0 +1,17 @@
+# MCP Server + Agent 依赖
+# 安装: pip install -r requirements.txt
+
+# MCP SDK (Model Context Protocol)
+mcp[cli]>=1.27.0
+
+# OpenAI SDK (用于 vLLM / 兼容 API)
+openai>=1.0.0
+
+# Netmiko (SSH 连接 Cisco IOS-XE 设备)
+netmiko>=4.0.0
+
+# PyYAML (读取设备清单 YAML)
+pyyaml>=6.0
+
+# httpx (HTTP 客户端，MCP SDK 依赖)
+httpx>=0.28.0

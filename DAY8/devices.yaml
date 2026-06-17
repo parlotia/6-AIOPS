@@ -1,0 +1,15 @@
+# 网络设备清单 (YAML 格式)
+# 与作业要求的 get_all_devices() 函数配合使用
+
+devices:
+  - name: C8Kv1
+    platform: cisco_ios
+    ip: 10.10.1.201
+    username: admin
+    password: Cisc0123
+
+  - name: C8Kv2
+    platform: cisco_ios
+    ip: 10.10.1.202
+    username: admin
+    password: Cisc0123
