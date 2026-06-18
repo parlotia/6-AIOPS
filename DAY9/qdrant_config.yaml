@@ -1,0 +1,15 @@
+# Qdrant 配置文件 - 启用 TLS + API Key 认证
+service:
+  api_key: Cisc0123
+  host: 0.0.0.0
+  http_port: 6333
+  grpc_port: 6334
+
+tls:
+  cert: /qdrant/certs/server.crt
+  key: /qdrant/certs/server.key
+
+storage:
+  storage_path: /qdrant/storage
+
+telemetry_disabled: true

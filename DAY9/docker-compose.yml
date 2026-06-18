@@ -1,0 +1,31 @@
+# Docker Compose - Qdrant 向量数据库 (TLS + 认证)
+#
+# 使用:
+#   docker compose up -d
+#   docker compose logs -f qdrant
+#   docker compose down
+#
+# 端口:
+#   6333 - HTTP API (TLS)
+#   6334 - gRPC API (TLS)
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: day9-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_config.yaml:/qdrant/config/config.yaml:ro
+      - ./certs:/qdrant/certs:ro
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__API_KEY=Cisc0123
+      - QDRANT__TLS__CERT=/qdrant/certs/server.crt
+      - QDRANT__TLS__KEY=/qdrant/certs/server.key
+      - QDRANT__SERVICE__ENABLE_TLS=true
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:
