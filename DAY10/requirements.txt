@@ -1,0 +1,26 @@
+# MCP SDK (Model Context Protocol) - Agent 本地使用
+mcp[cli]>=1.6
+
+# OpenAI SDK (用于 vLLM 兼容 API)
+openai>=1.0.0
+
+# Elasticsearch Python 客户端
+elasticsearch>=7.17.0,<8.0.0
+
+# httpx (HTTP 客户端，MCP SDK 依赖)
+httpx>=0.28.0
+# MCP Server (容器内) + Agent (本地) 依赖
+# 容器内安装: pip install -r requirements.txt
+# 本地 venv 也安装同一份
+
+# MCP SDK (Model Context Protocol)
+mcp[cli]>=1.27.0
+
+# OpenAI SDK (用于 vLLM 兼容 API)
+openai>=1.0.0
+
+# Elasticsearch Python 客户端 (MCP Server 查询 ES)
+elasticsearch>=7.17.0,<8.0.0
+
+# httpx (HTTP 客户端，MCP SDK 依赖)
+httpx>=0.28.0

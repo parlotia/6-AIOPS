@@ -1,0 +1,23 @@
+# Filebeat 配置 - 接收路由器 Syslog 并通过 Vector 写入 Elasticsearch
+#
+# 数据流:
+#   Router (syslog) → UDP :514 → Filebeat → (logstash:5044) → Vector → Elasticsearch
+#
+# 完全使用上课代码架构
+
+filebeat.inputs:
+  - type: udp
+    id: cisco-syslog-udp-514
+    enabled: true
+    host: "0.0.0.0:514"
+    fields_under_root: true
+    fields:
+      log_type: network
+      service.name: cisco-ios
+    tags: ["udp-syslog", "cisco"]
+
+processors:
+  - add_host_metadata: ~
+
+output.logstash:
+  hosts: ["day10-vector:5044"]

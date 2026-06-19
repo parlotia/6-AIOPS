@@ -1,0 +1,4 @@
+mcp>=1.6
+elasticsearch>=7.17,<8
+uvicorn>=0.30
+starlette>=0.37

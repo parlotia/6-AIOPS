@@ -1,0 +1,79 @@
+# Vector 配置 - 接收 Filebeat 日志并写入 Elasticsearch
+#
+# 数据流: Filebeat → (logstash协议:5044) → Vector → Elasticsearch
+
+api:
+  enabled: true
+  address: 0.0.0.0:8686
+
+sources:
+  from_filebeat:
+    type: logstash
+    address: 0.0.0.0:5044
+    mode: tcp
+
+  vector_metrics:
+    type: internal_metrics
+
+transforms:
+  normalize:
+    type: remap
+    inputs: ["from_filebeat"]
+    source: |
+      .event = if exists(.event) && is_object(.event) { .event } else { {} }
+      .event.original = to_string(.message) ?? encode_json(.)
+      .message = .event.original
+
+      log_type = to_string(.log_type) ?? "network"
+      .event.dataset = log_type
+
+      if !exists(.service.name) {
+        .service = if exists(.service) && is_object(.service) { .service } else { {} }
+        .service.name = log_type
+      }
+
+      .log = if exists(.log) && is_object(.log) { .log } else { {} }
+      .log.level = downcase(to_string(.log.level) ?? "info")
+
+      msg = .message
+      msg = replace(msg, r'\b(?:\d{1,3}\.){3}\d{1,3}\b', "<IP>")
+      msg = replace(msg, r'\b[0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}\b', "<MAC>")
+      msg = replace(msg, r'\b[0-9a-fA-F]{8,}\b', "<HEX>")
+      msg = replace(msg, r'(?i)(token|password|secret)=\S+', "<SECRET>")
+      msg = replace(msg, r'\bport \d+\b', "port <PORT>")
+      msg = replace(msg, r'\(\d+\)', "(<PORT>)")
+      .normalized_message = msg
+
+      if contains(downcase(.message), "failed password") || contains(downcase(.message), "denied") {
+        .log.level = "warning"
+      }
+      if contains(downcase(.message), "timeout") || contains(downcase(.message), "failed") || contains(downcase(.message), "down") {
+        .log.level = "error"
+      }
+
+      .target_index = "logs-" + log_type + "-default"
+
+  drop_noise:
+    type: filter
+    inputs: ["normalize"]
+    condition: |
+      !contains(downcase(string!(.message)), "healthcheck") &&
+      !contains(downcase(string!(.message)), "debug heartbeat")
+
+sinks:
+  elasticsearch_logs:
+    type: elasticsearch
+    inputs: ["drop_noise"]
+    endpoints: ["http://day10-elasticsearch:9200"]
+    api_version: v7
+    mode: bulk
+    bulk:
+      index: "{{ target_index }}"
+    encoding:
+      except_fields: ["target_index", "agent.ephemeral_id", "ecs.version"]
+    healthcheck: true
+
+  prom_metrics:
+    type: prometheus_exporter
+    inputs: ["vector_metrics"]
+    address: 0.0.0.0:9598

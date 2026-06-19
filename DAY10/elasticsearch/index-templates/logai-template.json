@@ -1,0 +1,34 @@
+{
+  "index_patterns": ["logs-logai-result-default"],
+  "priority": 500,
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "dynamic": true,
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "event_id": { "type": "keyword" },
+        "window_start": { "type": "date" },
+        "window_end": { "type": "date" },
+        "host": { "properties": { "name": { "type": "keyword" } } },
+        "service": { "properties": { "name": { "type": "keyword" } } },
+        "event": { "properties": { "dataset": { "type": "keyword" } } },
+        "drain3": {
+          "properties": {
+            "template_id": { "type": "keyword" },
+            "template": { "type": "keyword", "ignore_above": 4096 }
+          }
+        },
+        "anomaly_score": { "type": "float" },
+        "anomaly_type": { "type": "keyword" },
+        "severity": { "type": "keyword" },
+        "reason": { "type": "text" },
+        "evidence": { "type": "flattened" },
+        "llm_ready": { "type": "boolean" }
+      }
+    }
+  }
+}

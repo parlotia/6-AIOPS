@@ -1,0 +1,9 @@
+# 证书文件 (自签名, 不入库)
+certs/
+
+# 数据库与缓存
+*.db
+__pycache__/
+*.pyc
+
+# Elasticsearch 数据 (Docker volume 管理)

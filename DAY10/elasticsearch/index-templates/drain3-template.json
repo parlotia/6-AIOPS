@@ -1,0 +1,49 @@
+{
+  "index_patterns": [
+    "logs-drain3-template-default",
+    "logs-drain3-window-default"
+  ],
+  "priority": 500,
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "dynamic": true,
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "source_index": { "type": "keyword" },
+        "source_doc_id": { "type": "keyword" },
+        "message": { "type": "text" },
+        "normalized_message": { "type": "text" },
+        "window": { "type": "keyword" },
+        "window_start": { "type": "date" },
+        "window_end": { "type": "date" },
+        "host": { "properties": { "name": { "type": "keyword" } } },
+        "service": { "properties": { "name": { "type": "keyword" } } },
+        "event": { "properties": { "dataset": { "type": "keyword" } } },
+        "log": { "properties": { "level": { "type": "keyword" } } },
+        "drain3": {
+          "properties": {
+            "template_id": { "type": "keyword" },
+            "template": { "type": "keyword", "ignore_above": 4096 },
+            "parameters": { "type": "flattened" },
+            "cluster_size": { "type": "long" }
+          }
+        },
+        "count": { "type": "long" },
+        "count_per_minute": { "type": "float" },
+        "unique_src_ip": { "type": "long" },
+        "unique_user": { "type": "long" },
+        "first_seen": { "type": "date" },
+        "last_seen": { "type": "date" },
+        "is_new_template": { "type": "boolean" },
+        "baseline_count_avg": { "type": "float" },
+        "baseline_count_std": { "type": "float" },
+        "z_score": { "type": "float" },
+        "sample_doc_ids": { "type": "keyword" }
+      }
+    }
+  }
+}
